@@ -50,7 +50,7 @@ public:
 		outputWeights = new float[neuronsPerLayerCount*outputNeuronCount];
 
 		biases = new float* [hiddenLayerCount];
-		for (int i = 0; i < hiddenLayerCount; i++)
+		for (int i = 0; i < hiddenLayerCount+1; i++)
 			biases[i] = new float[neuronsPerLayerCount];
 	}
 
@@ -62,6 +62,18 @@ public:
 		free(inputWeights);
 		free(hiddenWeights);
 		free(outputWeights);
+	}
+
+	void setValues(float* inputNeurons,
+					float* inputWeights,
+					float* outputWeights,
+					float** hiddenWeights,
+					float** biases) {
+		this->inputNeurons = inputNeurons;
+		this->inputWeights = inputWeights;
+		this->outputWeights = outputWeights;
+		this->hiddenWeights = hiddenWeights;
+		this->biases = biases;
 	}
 
 	void randomizeWeights() {
@@ -94,7 +106,7 @@ public:
 
 	void randomizeBiases() {
 		std::clog << "Randomizing biases..." << std::endl;
-		for (int i = 0; i < hiddenLayerCount; i++) {
+		for (int i = 0; i < hiddenLayerCount+1; i++) {
 			for (int j = 0; j < neuronsPerLayerCount; j++) {
 				biases[i][j] = 0.0f;
 			}
@@ -156,6 +168,7 @@ public:
 			for (int j = 0; j < neuronsPerLayerCount; j++) {
 				outputNeurons[i] += hiddenNeurons[hiddenLayerCount-1][j] * outputWeights[i * neuronsPerLayerCount + j];
 			}
+			outputNeurons[i] += biases[hiddenLayerCount][i];
 			outputNeurons[i] = sigmoid(outputNeurons[i]);
 			std::clog << "Output neuron: " << i << " " << outputNeurons[i] << std::endl;
 		}

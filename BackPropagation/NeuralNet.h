@@ -75,8 +75,8 @@ public:
 		std::clog << "Hidden weights:" << std::endl;
 		for (int i = 0; i < hiddenLayerCount - 1; i++) {
 			for (int j = 0; j < neuronsPerLayerCount * neuronsPerLayerCount; j++) {
-				hiddenNeurons[i][j] = randomWeight();
-				std::clog << inputWeights[i] << std::endl;
+				hiddenWeights[i][j] = randomWeight();
+				std::clog << hiddenWeights[i][j] << std::endl;
 			}
 		}
 
@@ -134,12 +134,31 @@ public:
 			}
 			hiddenNeurons[0][i] += biases[0][i];
 			hiddenNeurons[0][i] = sigmoid(hiddenNeurons[0][i]);
-			std::clog << "Neuron: "<< hiddenNeurons[0][i] << std::endl;
+			std::clog << "Neuron: " << "0," << i << " "<< hiddenNeurons[0][i] << std::endl;
 		}
 
 		//------------hidden layers---------------
+		for (int i = 1; i < hiddenLayerCount; i++) {//start at 1 because the first layer was done above
+			for (int j = 0; j < neuronsPerLayerCount; j++) {
+				hiddenNeurons[i][j] = 0.0f;
+				for (int k = 0; k < neuronsPerLayerCount; k++) {
+					hiddenNeurons[i][j] += hiddenNeurons[i - 1][k] * hiddenWeights[i-1][j*neuronsPerLayerCount+k];
+				}
+				hiddenNeurons[i][j] += biases[i][j];
+				hiddenNeurons[i][j] = sigmoid(hiddenNeurons[i][j]);
+				std::clog << "Neuron: " << i << "," << j << " " << hiddenNeurons[i][j] << std::endl;
+			}
+		}
 
 		//-------last hidden layer to output----------
+		for (int i = 0; i < outputNeuronCount; i++) {
+			outputNeurons[i] = 0.0f;
+			for (int j = 0; j < neuronsPerLayerCount; j++) {
+				outputNeurons[i] += hiddenNeurons[hiddenLayerCount-1][j] * outputWeights[i * neuronsPerLayerCount + j];
+			}
+			outputNeurons[i] = sigmoid(outputNeurons[i]);
+			std::clog << "Output neuron: " << i << " " << outputNeurons[i] << std::endl;
+		}
 	}
 
 };
